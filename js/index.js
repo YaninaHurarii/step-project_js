@@ -347,7 +347,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Додавання та сортування інформації про тренерів від А до Я та за досвідом
+  // Додавання та сортування інформації про тренерів від А до Я та за досвідом від більшого до меншого
 
   function sortCards(mousedownBtn, arraySorting) {
     const button = document.getElementById(mousedownBtn);
@@ -366,7 +366,7 @@ document.addEventListener("DOMContentLoaded", () => {
   sortCards("sort-experience", (a, b) => {
     const experienceA = parseInt(a.experience.split(" ")[0]);
     const experienceB = parseInt(b.experience.split(" ")[0]);
-    return experienceA - experienceB;
+    return experienceB - experienceA;
   });
 
   // Фільтрація за категоріями та напрямками
