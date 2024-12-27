@@ -244,10 +244,11 @@ document.addEventListener("DOMContentLoaded", () => {
     },
   ];
 
-  // Клонування темплейту та додавання інформації про тренерів у вигляді масиву карток з кнопкою
-  
+  // Клонування, додавання карток, відкриття/закриття модального вікна про тренерів та прибирання скролу
+
   const container = document.querySelector(".trainers-cards__container");
-  
+  let originalData = [...DATA];
+
   function addCards(data, container, template) {
     container.textContent = "";
     data.forEach((trainer, trainerIndex) => {
@@ -264,8 +265,6 @@ document.addEventListener("DOMContentLoaded", () => {
       container.append(cloneTemplate);
     });
 
-    // Слухач евенту на події та відкриття модального вікна при натисканні на кнопку "Показати"
-
     container.querySelectorAll(".trainer__show-more").forEach((button) => {
       button.addEventListener("mousedown", (event) => {
         const trainerIndex = event.target.dataset.index;
@@ -275,8 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Клонування, додавання карток, відкриття/закриття модального вікна про тренерів та прибирання скролу
-
+  // Відкриття модального окна
   function modalOpen(trainer) {
     const modalTemplate = document.getElementById("modal-template");
     const modalClone = modalTemplate.content.cloneNode(true);
@@ -289,7 +287,6 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.querySelector(".modal__point--experience").innerText = `Досвід: ${trainer.experience}`;
     modal.querySelector(".modal__point--specialization").innerText = `Напрям тренера: ${trainer.specialization}`;
     modal.querySelector(".modal__text").innerText = trainer.description;
-
 
     document.body.append(modal);
     document.body.classList.toggle("no-scroll", true);
@@ -307,14 +304,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Завантаження карток тренерів
   function getTrainerCards({
     data,
     containerCards,
     templateCard,
-    filterArr = [],}) {
-		
-    document.querySelector(containerCards);
-	console.log(document.querySelector(containerCards));
+    filterArr = [],
+  }) {
+    const container = document.querySelector(containerCards);
     const template = document.querySelector(templateCard);
 
     addCards(data, container, template);
@@ -334,7 +331,7 @@ document.addEventListener("DOMContentLoaded", () => {
     filterArr: [".sorting", ".sidebar"],
   });
 
-  // Робимо активними кнопки ЗА ПРІЗВИЩЕМ та ЗА ДОСВІДОМ
+  // Робимо активними кнопки сортування
 
   function setActiveBtn(activeBtn) {
     let buttons = document.querySelectorAll(".sorting__btn");
@@ -347,8 +344,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Додавання та сортування інформації про тренерів від А до Я та за досвідом від більшого до меншого
-
+  // Додавання та сортування інформації про тренерів за прізвищем від А до Я та за досвідом від більшого до меншого
+  
   function sortCards(mousedownBtn, arraySorting) {
     const button = document.getElementById(mousedownBtn);
     button.addEventListener("mousedown", () => {
@@ -383,15 +380,13 @@ document.addEventListener("DOMContentLoaded", () => {
     specialist: "спеціаліст",
     instructor: "інструктор",
   };
-  
-	const form = document.querySelector("form");
+
+  const form = document.querySelector("form");
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
 
-    const directionInput = form.querySelector(
-      'input[name="direction"]:checked'
-    );
+    const directionInput = form.querySelector('input[name="direction"]:checked');
     const categoryInput = form.querySelector('input[name="category"]:checked');
 
     const direction = directionInput ? directionInput.value : null;
@@ -402,12 +397,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const directionText = (allDirection[direction] || direction).toUpperCase();
     const categoryText = (allCategory[category] || category).toUpperCase();
 
-    // Фільтрація за спеціализацією
+    // Фільтрація за напрямками
+	
     const filterDirection = DATA.filter((trainer) => {
       return (direction === "all" || trainer.specialization.toUpperCase().includes(directionText));
     });
 
     // Фільтрація за категорією
+	
     const filterСategory = filterDirection.filter((trainer) => {
       return (category === "all" || trainer.category.toUpperCase().includes(categoryText));
     });
@@ -417,5 +414,18 @@ document.addEventListener("DOMContentLoaded", () => {
       container,
       document.getElementById("trainer-card")
     );
+  });
+
+  setActiveBtn("default-sort");
+  
+  const defaultSortButton = document.getElementById("default-sort");
+  defaultSortButton.addEventListener("mousedown", () => {
+    form.reset();
+
+    DATA.length = 0;
+    DATA.push(...originalData);
+
+    addCards(DATA, container, document.querySelector("#trainer-card"));
+    setActiveBtn("default-sort");
   });
 });
